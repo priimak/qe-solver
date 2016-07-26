@@ -19,7 +19,12 @@ public interface QuadraticEquationSolver {
         /**
          * Simple method relying on the well known formulae x_{1,2} = \frac{-b \pm \sqrt{b^2-4ac}}{2a}
          */
-        SIMPLE
+        SIMPLE,
+
+        /**
+         * Same method is as {@link #SIMPLE} but uses Apfloat library.
+         */
+        SIMPLE_AP
     };
 
     /**

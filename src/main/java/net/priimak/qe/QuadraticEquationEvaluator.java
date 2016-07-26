@@ -1,11 +1,11 @@
 package net.priimak.qe;
 
+import org.apfloat.Apfloat;
+
 /**
  * Utility class that contains evaluation functions that operate on the {@link QuadraticEquation}.
  */
 public final class QuadraticEquationEvaluator {
-    private static final long APFLOAT_PRECISION = 100;
-
     private QuadraticEquationEvaluator() {
         throw new AssertionError();
     }
@@ -18,6 +18,14 @@ public final class QuadraticEquationEvaluator {
      * @return value of the quadratic formulae computed at point {@code x}.
      */
     public static double compute(QuadraticEquation equation, double x) {
-        return (equation.getA() * x + equation.getB()) * x + equation.getC();
+        return compute(equation, new Apfloat(x));
+    }
+
+    public static double compute(QuadraticEquation equation, Apfloat x) {
+        Apfloat y = new Apfloat(equation.getA()).multiply(x).multiply(x)
+            .add(new Apfloat(equation.getB()).multiply(x))
+            .add(new Apfloat(equation.getC()));
+        return y
+            .doubleValue();
     }
 }

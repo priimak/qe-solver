@@ -16,6 +16,8 @@ public class QuadraticEquationSolverFactory {
                 return SimpleQuadraticEquationSolver.INSTANCE;
             case CITARDAUQ:
                 return CitardauqQuadraticEquationSolver.INSTANCE;
+            case SIMPLE_AP:
+                return SimpleApQuadraticEquationSolver.INSTANCE;
             default:
                 throw new IllegalArgumentException();
         }

@@ -24,7 +24,15 @@ public final class TestSolvers {
         new QuadraticEquation(0, 1, 1),
         new QuadraticEquation(0, 0, 1),
         new QuadraticEquation(0, 1, 0),
-        new QuadraticEquation(1, 0, 0)
+        new QuadraticEquation(1, 0, 0),
+
+        new QuadraticEquation(1, -3, 2),
+        new QuadraticEquation(1e200, -3e200, 2e200),
+        new QuadraticEquation(1e-200, -3e-200, 2e-200),
+        new QuadraticEquation(-1e200, 3e200, -2e200),
+        new QuadraticEquation(-1e-200, 3e-200, -2e-200),
+
+        new QuadraticEquation(-1e-200, 3e-200, 2e-199)
     );
 
     /**
@@ -43,7 +51,7 @@ public final class TestSolvers {
      */
     @Test(enabled = false)
     public void testSimpleSolver() {
-        testSolver(QuadraticEquationSolverFactory.getSolver(QuadraticEquationSolver.Type.SIMPLE));
+        testSolver(QuadraticEquationSolverFactory.getSolver(QuadraticEquationSolver.Type.SIMPLE_AP));
     }
 
     @Test
@@ -55,10 +63,12 @@ public final class TestSolvers {
         System.out.println(String.format("\nTesting %s", solver.getClass().getSimpleName()));
         for (QuadraticEquation equation : EQUATIONS) {
             try {
-                double[] roots = solver.solve(equation);
+                QuadraticEquation eq = QuadraticEquation.simplify(equation);
+                double[] roots = solver.solve(eq);
                 for (double root : roots) {
-                    System.out.println(equation + " : root = " + root + " -> " + QuadraticEquationEvaluator.compute(equation, root));
-                    Apfloat y = new Apfloat(QuadraticEquationEvaluator.compute(equation, root), 100);
+                    double value = QuadraticEquationEvaluator.compute(eq, root);
+                    System.out.println(equation + " : root = " + root + " -> " + value);
+                    Apfloat y = new Apfloat(value, 100);
                     if (root == 0) {
                         Assert.assertEquals(ApfloatMath.abs(y).compareTo(MAX_ZERO_ERROR) < 0, true,
                             equation + " @ x = " + root + " -> " + y);
@@ -74,14 +84,5 @@ public final class TestSolvers {
                 Assert.fail(outOfNumericRange.getMessage());
             }
         }
-
-        // test overflow
-        try {
-            QuadraticEquation equation = new QuadraticEquation(-1.0E10, 1.0E200, 1);
-            solver.solve(equation);
-            Assert.fail(String.format(
-                "Solving of equation %s = 0 should have thrown OutOfNumericRange exception", equation
-            ));
-        } catch (OutOfNumericRange ignore) { }
     }
 }
