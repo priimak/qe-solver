@@ -1,5 +1,7 @@
 package net.priimak.qe;
 
+import org.apfloat.Apfloat;
+
 /**
  * Immutable class that represent quadratic equation ax^2 + bx + c = 0
  */
@@ -9,9 +11,13 @@ public final class QuadraticEquation {
     private static long EXPONENT_MASK = 0x7ff0000000000000L;
     private static long MANTISSA_MASK = 0x000fffffffffffffL;
 
-    private final double b;
     private final double a;
+    private final double b;
     private final double c;
+
+    private final Apfloat aAp;
+    private final Apfloat bAp;
+    private final Apfloat cAp;
 
     /**
      * Create instance of {@code QuadraticEquation} where parameters a, b and c represent parameters
@@ -21,6 +27,10 @@ public final class QuadraticEquation {
         this.a = a;
         this.b = b;
         this.c = c;
+
+        aAp = new Apfloat(a);
+        bAp = new Apfloat(b);
+        cAp = new Apfloat(c);
     }
 
     @Override
@@ -38,6 +48,18 @@ public final class QuadraticEquation {
 
     public double getC() {
         return c;
+    }
+
+    public Apfloat getaAp() {
+        return aAp;
+    }
+
+    public Apfloat getbAp() {
+        return bAp;
+    }
+
+    public Apfloat getcAp() {
+        return cAp;
     }
 
     public static long exponent(double number) {
@@ -116,7 +138,7 @@ public final class QuadraticEquation {
         return -1;
     }
 
-    private static double getDelta(double number) {
+    public static double getDelta(double number) {
         long exp = Double.doubleToLongBits(number) & EXPONENT_MASK;
         double nextNearest = Double.longBitsToDouble(exp | 0x0000000000000001L);
         return nextNearest - Double.longBitsToDouble(exp);

@@ -2,6 +2,7 @@ package net.priimak.qe;
 
 import java.util.Arrays;
 import java.util.List;
+import net.priimak.numeric.Value;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -31,14 +32,35 @@ public final class TestSolvers {
         new QuadraticEquation(-1e-200, 3e-200, -2e-200),
 
         new QuadraticEquation(-1e-200, 3e-200, 2e-199),
-        new QuadraticEquation(-1e-200, 3e-201, 2e97)
+        new QuadraticEquation(-1e-200, 3e-201, 2e97),
+
+        new QuadraticEquation(1.0, -2.000000028975950, 1.000000028975950),
+        new QuadraticEquation(1.0, -2.000000028975951, 1.000000028975951),
+        new QuadraticEquation(1.0, -2.000000028975952, 1.000000028975952),
+        new QuadraticEquation(1.0, -2.000000028975953, 1.000000028975953),
+        new QuadraticEquation(1.0, -2.000000028975954, 1.000000028975954),
+        new QuadraticEquation(1.0, -2.000000028975955, 1.000000028975955),
+        new QuadraticEquation(1.0, -2.000000028975956, 1.000000028975956),
+        new QuadraticEquation(1.0, -2.000000028975957, 1.000000028975957),
+        new QuadraticEquation(1.0, -2.000000028975958, 1.000000028975958),
+        new QuadraticEquation(1.0, -2.000000028975959, 1.000000028975959),
+        new QuadraticEquation(1.0, -2.000000028975960, 1.000000028975960),
+        new QuadraticEquation(1.0, -2.000000028975961, 1.000000028975961),
+        new QuadraticEquation(1.0, -2.000000028975962, 1.000000028975962),
+        new QuadraticEquation(1.0, -2.000000028975963, 1.000000028975963),
+        new QuadraticEquation(1.0, -2.000000028975964, 1.000000028975964),
+        new QuadraticEquation(1.0, -2.000000028975965, 1.000000028975965),
+        new QuadraticEquation(1.0, -2.000000028975966, 1.000000028975966),
+        new QuadraticEquation(1.0, -2.000000028975967, 1.000000028975967),
+        new QuadraticEquation(1.0, -2.000000028975968, 1.000000028975968),
+        new QuadraticEquation(1.0, -2.000000028975969, 1.000000028975969)
     );
 
     /**
      * Maximum relative error of the computed root computed by the dividing error by the value of the root or the
      * smallest possible value for double.
      */
-    private static final double MAXIMUM_RELATIVE_ERROR = 0.01;
+    private static final double MAXIMUM_RELATIVE_ERROR = 1.0E-20;
 
     /**
      * This test will fail due to significant numerical
@@ -49,9 +71,32 @@ public final class TestSolvers {
         testSolver(QuadraticEquationSolverFactory.getSolver(QuadraticEquationSolver.Type.SIMPLE_AP));
     }
 
-    @Test
+    @Test(enabled = false)
     public void testCitardauqSolver() {
         testSolver(QuadraticEquationSolverFactory.getSolver(QuadraticEquationSolver.Type.CITARDAUQ));
+    }
+
+    @Test
+    public void testNewSolver() {
+        testNewSolver(NewQadraticEquationSolver.INSTANCE);
+    }
+
+    private static void testNewSolver(NewQadraticEquationSolver solver) {
+        System.out.println(String.format("\nTesting %s", solver.getClass().getSimpleName()));
+        for (QuadraticEquation equation : EQUATIONS) {
+            try {
+                List<Value<Double>> roots = NewQadraticEquationSolver.INSTANCE.solve(equation, MAXIMUM_RELATIVE_ERROR);
+                for (Value<Double> root : roots) {
+                    double value = QuadraticEquationEvaluator.compute(equation, root.getValue());
+                    System.out.println(equation + " : root = [" + root + "] -> " + value);
+                }
+                if (!roots.isEmpty()) {
+                    System.out.println();
+                }
+            } catch (OutOfNumericRange outOfNumericRange) {
+                Assert.fail(outOfNumericRange.getMessage());
+            }
+        }
     }
 
     private static void testSolver(QuadraticEquationSolver solver) {

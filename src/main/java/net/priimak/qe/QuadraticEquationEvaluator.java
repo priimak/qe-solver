@@ -18,14 +18,12 @@ public final class QuadraticEquationEvaluator {
      * @return value of the quadratic formulae computed at point {@code x}.
      */
     public static double compute(QuadraticEquation equation, double x) {
-        return compute(equation, new Apfloat(x));
+        return compute(equation, new Apfloat(x)).doubleValue();
     }
 
-    public static double compute(QuadraticEquation equation, Apfloat x) {
-        Apfloat y = new Apfloat(equation.getA()).multiply(x).multiply(x)
-            .add(new Apfloat(equation.getB()).multiply(x))
-            .add(new Apfloat(equation.getC()));
-        return y
-            .doubleValue();
+    public static Apfloat compute(QuadraticEquation equation, Apfloat x) {
+        return new Apfloat(String.format("%s", equation.getA()), NewQadraticEquationSolver.APFLOAT_PRECESSION).multiply(x).multiply(x)
+            .add(new Apfloat(String.format("%s", equation.getB()), NewQadraticEquationSolver.APFLOAT_PRECESSION).multiply(x))
+            .add(new Apfloat(String.format("%s", equation.getC()), NewQadraticEquationSolver.APFLOAT_PRECESSION));
     }
 }
