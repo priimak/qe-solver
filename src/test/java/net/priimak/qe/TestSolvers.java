@@ -2,8 +2,6 @@ package net.priimak.qe;
 
 import java.util.Arrays;
 import java.util.List;
-import org.apfloat.Apfloat;
-import org.apfloat.ApfloatMath;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -32,18 +30,15 @@ public final class TestSolvers {
         new QuadraticEquation(-1e200, 3e200, -2e200),
         new QuadraticEquation(-1e-200, 3e-200, -2e-200),
 
-        new QuadraticEquation(-1e-200, 3e-200, 2e-199)
+        new QuadraticEquation(-1e-200, 3e-200, 2e-199),
+        new QuadraticEquation(-1e-200, 3e-201, 2e97)
     );
 
     /**
-     * If root != 0 then we relative error, i.e. abs(y(root)/root) must less than this this value.
+     * Maximum relative error of the computed root computed by the dividing error by the value of the root or the
+     * smallest possible value for double.
      */
-    private static Apfloat MAX_RELATIVE_ERROR = new Apfloat(0.1, 100);
-
-    /**
-     * If root = 0 then numerical deviation of quadratic equation at zero must not be greater than this value.
-     */
-    private static Apfloat MAX_ZERO_ERROR = new Apfloat(1.0E-11, 100);
+    private static final double MAXIMUM_RELATIVE_ERROR = 0.01;
 
     /**
      * This test will fail due to significant numerical
@@ -63,22 +58,15 @@ public final class TestSolvers {
         System.out.println(String.format("\nTesting %s", solver.getClass().getSimpleName()));
         for (QuadraticEquation equation : EQUATIONS) {
             try {
-                QuadraticEquation eq = QuadraticEquation.simplify(equation);
-                double[] roots = solver.solve(eq);
-                for (double root : roots) {
-                    double value = QuadraticEquationEvaluator.compute(eq, root);
-                    System.out.println(equation + " : root = " + root + " -> " + value);
-                    Apfloat y = new Apfloat(value, 100);
-                    if (root == 0) {
-                        Assert.assertEquals(ApfloatMath.abs(y).compareTo(MAX_ZERO_ERROR) < 0, true,
-                            equation + " @ x = " + root + " -> " + y);
-                    } else {
-                        Assert.assertEquals(
-                            ApfloatMath.abs(y.divide(new Apfloat(root, 100))).compareTo(MAX_RELATIVE_ERROR) < 0,
-                            true,
-                            equation + " : x = " + root + " -> " + y
-                        );
-                    }
+                double[] roots = QuadraticEquation.deduceError(equation, solver.solve(equation));
+                for (int i = 0; i < roots.length / 2; i++) {
+                    double root = roots[i];
+                    double value = QuadraticEquationEvaluator.compute(equation, root);
+                    double error = roots[roots.length / 2 + i];
+                    System.out.println(equation + " : root = [" + root + " ± " + error + "] -> " + value);
+                    double relativeError = Math.abs(error / (root == 0 ? Double.MIN_VALUE : root));
+                    Assert.assertEquals(relativeError < MAXIMUM_RELATIVE_ERROR, true,
+                        String.format("Relative error %s is greater than %s", relativeError, MAXIMUM_RELATIVE_ERROR));
                 }
             } catch (OutOfNumericRange outOfNumericRange) {
                 Assert.fail(outOfNumericRange.getMessage());

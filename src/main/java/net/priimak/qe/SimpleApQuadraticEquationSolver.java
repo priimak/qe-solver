@@ -14,7 +14,7 @@ enum SimpleApQuadraticEquationSolver implements QuadraticEquationSolver {
         Apfloat a = new Apfloat(equation.getA(), 100);
         Apfloat b = new Apfloat(equation.getB(), 100);
         Apfloat c = new Apfloat(equation.getC(), 100);
-        double[] result = QuadraticEquationSolverFactory.handleCornerCases(equation.getA(), equation.getB(), equation.getC());
+        double[] result = QuadraticEquationSolverFactory.handleCornerCases(equation);
         if (result != null) {
             return result;
         } else {

@@ -19,7 +19,7 @@ public class QuadraticEquationSolverFactory {
             case SIMPLE_AP:
                 return SimpleApQuadraticEquationSolver.INSTANCE;
             default:
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Unknown quadratic equation solver type");
         }
     }
 
@@ -47,7 +47,10 @@ public class QuadraticEquationSolverFactory {
      *         containing real roots of quadratic equation.
      * @throws OutOfNumericRange if numeric overflow occurred.
      */
-    static double[] handleCornerCases(double a, double b, double c) throws OutOfNumericRange {
+    static double[] handleCornerCases(QuadraticEquation equation) throws OutOfNumericRange {
+        double a = equation.getA();
+        double b = equation.getB();
+        double c = equation.getC();
         if (a == 0) {
             if (b == 0) {
                 // c = 0

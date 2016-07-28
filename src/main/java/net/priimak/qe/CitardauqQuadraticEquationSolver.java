@@ -3,19 +3,22 @@ package net.priimak.qe;
 enum CitardauqQuadraticEquationSolver implements QuadraticEquationSolver {
     /**
      * Instance of {@link CitardauqQuadraticEquationSolver} that solves quadratic equation using Citardauq formulae.
-     * See {@link QuadraticEquationSolver.Type#CITARDAUQ} for more details.
+     * Before computing root, equation is simplified by passing it through
+     * {@link QuadraticEquation#simplify(QuadraticEquation)}. See {@link QuadraticEquationSolver.Type#CITARDAUQ} for
+     * more details.
      */
     INSTANCE;
 
     @Override
     public double[] solve(QuadraticEquation equation) throws OutOfNumericRange {
-        double a = equation.getA();
-        double b = equation.getB();
-        double c = equation.getC();
-        double[] result = QuadraticEquationSolverFactory.handleCornerCases(a, b, c);
+        double[] result = QuadraticEquationSolverFactory.handleCornerCases(equation);
         if (result != null) {
             return result;
         } else {
+            QuadraticEquation simplifiedEquation = QuadraticEquation.simplify(equation);
+            double a = simplifiedEquation.getA();
+            double b = simplifiedEquation.getB();
+            double c = simplifiedEquation.getC();
             // ax^2 + bx + c = 0
             double discriminant = QuadraticEquationSolverFactory.ensureFiniteNumber(b * b - 4 * a * c);
             if (discriminant < 0) {
